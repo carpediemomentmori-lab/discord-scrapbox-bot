@@ -34,11 +34,13 @@ async function getMcpClient() {
 }
 
 function getTodayTitle() {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  return `${y}/${m}/${d}`;
+  const parts = new Date().toLocaleDateString('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).split('/');
+  return `${parts[0]}/${parts[1]}/${parts[2]}`;
 }
 
 export async function appendToDailyNote(line) {

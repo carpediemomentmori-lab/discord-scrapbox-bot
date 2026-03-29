@@ -12,6 +12,15 @@ if (missing.length > 0) {
 
 const CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
 
+function getJSTTime() {
+  return new Date().toLocaleTimeString('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
 const discord = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -34,8 +43,9 @@ discord.on(Events.MessageCreate, async (message) => {
 
   const text = message.content.trim();
   if (text) {
+    const time = getJSTTime();
     const linked = await addWikiLinks(text);
-    lines.push(`　${linked}`);
+    lines.push(`${time} ${linked}`);
   }
 
   for (const attachment of message.attachments.values()) {
