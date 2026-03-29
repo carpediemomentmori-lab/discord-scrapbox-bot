@@ -41,11 +41,11 @@ function getTodayTitle() {
   return `${y}/${m}/${d}`;
 }
 
-export async function appendToDailyNote(content) {
+export async function appendToDailyNote(line) {
   const title = getTodayTitle();
-  const line = `　${content}`;
 
-  console.log(`[DEBUG] title="${title}" line="${line}"`);
+  console.log(`[DEBUG] title="${title}" line="${line}"`)
+
 
   const client = await getMcpClient();
 

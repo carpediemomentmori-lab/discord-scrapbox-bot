@@ -28,11 +28,25 @@ discord.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
   if (message.channelId !== CHANNEL_ID) return;
 
-  const content = message.content.trim();
-  if (!content) return;
+  const lines = [];
+
+  const text = message.content.trim();
+  if (text) {
+    lines.push(`　${text}`);
+  }
+
+  for (const attachment of message.attachments.values()) {
+    if (attachment.contentType?.startsWith('image/')) {
+      lines.push(`[${attachment.url}]`);
+    }
+  }
+
+  if (lines.length === 0) return;
 
   try {
-    await appendToDailyNote(content);
+    for (const line of lines) {
+      await appendToDailyNote(line);
+    }
     await message.react('✅');
   } catch (error) {
     console.error('Failed to append to Scrapbox:', error);
