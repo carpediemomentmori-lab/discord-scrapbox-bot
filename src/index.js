@@ -1,5 +1,6 @@
 import { Client, GatewayIntentBits, Events } from 'discord.js';
 import { appendToDailyNote } from './scrapbox.js';
+import { addWikiLinks } from './claude.js';
 
 const required = ['DISCORD_TOKEN', 'DISCORD_CHANNEL_ID', 'SCRAPBOX_PROJECT', 'COSENSE_SID'];
 const missing = required.filter((key) => !process.env[key]);
@@ -32,7 +33,8 @@ discord.on(Events.MessageCreate, async (message) => {
 
   const text = message.content.trim();
   if (text) {
-    lines.push(`　${text}`);
+    const linked = await addWikiLinks(text);
+    lines.push(`　${linked}`);
   }
 
   for (const attachment of message.attachments.values()) {
