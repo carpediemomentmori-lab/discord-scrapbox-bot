@@ -1,8 +1,6 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
-const NON_EXISTENT_LINE = '\x00__append_sentinel__\x00';
-
 let mcpClient = null;
 let mcpTransport = null;
 
@@ -47,42 +45,39 @@ export async function appendToDailyNote(content) {
   const title = getTodayTitle();
   const line = `　・${content}`;
 
+  console.log(`[DEBUG] title="${title}" line="${line}"`);
+
   const client = await getMcpClient();
 
-  // ページ存在確認
-  const getResult = await client.callTool({
-    name: 'get_page',
-    arguments: { pageTitle: title },
+  // まず create_page を試みる（当日初回メッセージ）
+  const createResult = await client.callTool({
+    name: 'create_page',
+    arguments: {
+      pageTitle: title,
+      pageBody: line,
+      format: 'scrapbox',
+    },
   });
 
-  if (getResult.isError) {
-    // ページ未作成 → 新規作成
-    const createResult = await client.callTool({
-      name: 'create_page',
-      arguments: {
-        pageTitle: title,
-        pageBody: line,
-        format: 'scrapbox',
-      },
-    });
-    if (createResult.isError) {
-      throw new Error(`create_page failed: ${JSON.stringify(createResult.content)}`);
-    }
-  } else {
-    // ページあり → 末尾に追記
-    // targetLine に存在しない文字列を指定すると末尾に追記される
-    const insertResult = await client.callTool({
-      name: 'insert_lines',
-      arguments: {
-        pageTitle: title,
-        targetLine: NON_EXISTENT_LINE,
-        text: line,
-        format: 'scrapbox',
-      },
-    });
-    if (insertResult.isError) {
-      throw new Error(`insert_lines failed: ${JSON.stringify(insertResult.content)}`);
-    }
+  if (!createResult.isError) {
+    console.log(`[${title}] Created: ${line}`);
+    return;
+  }
+
+  // ページが既存 → insert_lines で末尾追記
+  // targetLine に存在しない値を指定すると末尾に追記される
+  const insertResult = await client.callTool({
+    name: 'insert_lines',
+    arguments: {
+      pageTitle: title,
+      targetLine: '\x00nonexistent\x00',
+      text: line,
+      format: 'scrapbox',
+    },
+  });
+
+  if (insertResult.isError) {
+    throw new Error(`insert_lines failed: ${JSON.stringify(insertResult.content)}`);
   }
 
   console.log(`[${title}] Appended: ${line}`);
