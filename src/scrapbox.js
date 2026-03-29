@@ -43,7 +43,7 @@ function getTodayTitle() {
 
 export async function appendToDailyNote(content) {
   const title = getTodayTitle();
-  const line = `　・${content}`;
+  const line = `　${content}`;
 
   console.log(`[DEBUG] title="${title}" line="${line}"`);
 
