@@ -34,13 +34,18 @@ async function getMcpClient() {
 }
 
 function getTodayTitle() {
-  const parts = new Date().toLocaleDateString('ja-JP', {
+  const now = new Date();
+  const parts = now.toLocaleDateString('ja-JP', {
     timeZone: 'Asia/Tokyo',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
   }).split('/');
-  return `${parts[0]}/${parts[1]}/${parts[2]}`;
+  const weekday = now.toLocaleDateString('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+    weekday: 'short',
+  });
+  return `${parts[0]}/${parts[1]}/${parts[2]}(${weekday})`;
 }
 
 export async function appendToDailyNote(line) {

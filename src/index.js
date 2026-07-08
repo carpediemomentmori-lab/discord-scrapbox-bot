@@ -1,6 +1,5 @@
 import { Client, GatewayIntentBits, Events } from 'discord.js';
 import { appendToDailyNote } from './scrapbox.js';
-import { addWikiLinks } from './claude.js';
 import { uploadToGyazo } from './gyazo.js';
 
 const required = ['DISCORD_TOKEN', 'DISCORD_CHANNEL_ID', 'SCRAPBOX_PROJECT', 'COSENSE_SID'];
@@ -44,8 +43,7 @@ discord.on(Events.MessageCreate, async (message) => {
   const text = message.content.trim();
   if (text) {
     const time = getJSTTime();
-    const linked = await addWikiLinks(text);
-    lines.push(`${time} ${linked}`);
+    lines.push(`${time} ${text}`);
   }
 
   for (const attachment of message.attachments.values()) {
